@@ -36,6 +36,7 @@ environment:
 
     - TARGET_ARCH: x64
       VC_VERSION: 14
+      CONDA_PY: 35
 
 
 # We always use a 64-bit machine, but can build x86 distributions
