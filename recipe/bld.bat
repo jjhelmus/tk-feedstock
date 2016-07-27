@@ -5,8 +5,7 @@ if "%ARCH%"=="32" (
 )
 
 :: Get the major minor version info (e.g. `8_6`) so it can be used in the URL.
-python -c "import os; print('_'.join(os.environ['PKG_VERSION'].split('.')[:2]))" > temp.txt
-set /p MAJ_MIN_VER=<temp.txt
+set /p MAJ_MIN_VER=8_6
 
 curl -L -o tcl%PKG_VERSION%.tar.gz "ftp://ftp.tcl.tk/pub/tcl/tcl%MAJ_MIN_VER%/tcl%PKG_VERSION%-src.tar.gz"
 curl -L -o tk%PKG_VERSION%.tar.gz "ftp://ftp.tcl.tk/pub/tcl/tcl%MAJ_MIN_VER%/tk%PKG_VERSION%-src.tar.gz"

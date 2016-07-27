@@ -9,16 +9,12 @@ package:
 build:
   number: 0
   detect_binary_files_with_prefix: true
-  features:
-    - vc9     # [win and py27]
-    - vc10    # [win and py34]
-    - vc14    # [win and py35]
 
 requirements:
   build:
-    - python         # [win]
-    - curl           # [win]
-    - 7za            # [win]
+    - vc             # [win]
+  run:
+    - vc             # [win]
 
 test:
   requires:
