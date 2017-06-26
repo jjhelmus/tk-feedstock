@@ -1,0 +1,68 @@
+{% set version = "8.5.19" %}
+
+{% set VC_VERSION = os.environ.get('VC_VERSION', '9')|string %}
+
+package:
+  name: tk
+  version: {{ version }}
+
+source:
+  fn: tk{{ version }}-src.tar.gz
+  url: ftp://ftp.tcl.tk/pub/tcl/tcl8_5/tk{{ version }}-src.tar.gz
+
+build:
+  number: 0
+  detect_binary_files_with_prefix: true
+  features:
+    - vc{{ VC_VERSION }}   # [win]
+      
+requirements:
+  build:
+    - curl                 # [win]
+    - 7za                  # [win]
+    - vc {{ VC_VERSION }}  # [win]
+    - tcl {{ version }}
+  run:
+    - vc {{ VC_VERSION }}  # [win]
+    - tcl {{ version }}
+
+test:
+
+  files:
+    - hello.tcl
+
+  commands:
+    # Check for binaries.
+    - test -f "${PREFIX}/bin/wish"     # [unix]
+    - test -f "${PREFIX}/bin/wish8.5"  # [unix]
+    - if not exist %LIBRARY_PREFIX%\\bin\\wish.exe exit 1    # [win]
+    - if not exist %LIBRARY_PREFIX%\\bin\\wish85.exe exit 1  # [win]
+
+    # Check for includes.
+    - test -f "${PREFIX}/include/tk.h"           # [unix]
+    - test -f "${PREFIX}/include/tkDecls.h"      # [unix]
+    - test -f "${PREFIX}/include/tkPlatDecls.h"  # [unix]
+    - if not exist %LIBRARY_PREFIX%\\include\\tk.h exit 1           # [win]
+    - if not exist %LIBRARY_PREFIX%\\include\\tkDecls.h exit 1      # [win]
+    - if not exist %LIBRARY_PREFIX%\\include\\tkPlatDecls.h exit 1  # [win]
+
+    # Check for libraries.
+    # Library naming note: t means "full thread support" in Windows
+    #    https://sourceforge.net/p/tcl/mailman/tcl-bugs/thread/From_noreply@sourceforge.net_Mon_Jul_23_11:46:16_2012/
+    - test -f "${PREFIX}/lib/libtk8.5.dylib"  # [osx]
+    - test -f "${PREFIX}/lib/libtk8.5.so"     # [linux]
+    - test -f "${PREFIX}/lib/libtkstub8.5.a"  # [unix]
+    - if not exist %LIBRARY_PREFIX%\\lib\\tk85.lib exit 1      # [win]
+    - if not exist %LIBRARY_PREFIX%\\bin\\tk85.dll exit 1      # [win]
+    - if not exist %LIBRARY_PREFIX%\\lib\\tkstub85.lib exit 1  # [win]
+
+    # Check commands work and run a simple program.
+    - wish hello.tcl
+    - wish8.5 hello.tcl  # [unix]
+    - wish85 hello.tcl   # [win]
+
+about:
+  home: http://www.tcl.tk/
+  license: Tcl/Tk
+  license_family: BSD
+  summary: Cross-platform GUI widget toolkit for Tcl.

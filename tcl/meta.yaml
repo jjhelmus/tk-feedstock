@@ -1,0 +1,70 @@
+{% set version = "8.5.19" %}
+
+{% set VC_VERSION = os.environ.get('VC_VERSION', '9')|string %}
+
+package:
+  name: tcl
+  version: {{ version }}
+
+source:
+  fn: tcl{{ version }}-src.tar.gz
+  url: ftp://ftp.tcl.tk/pub/tcl/tcl8_5/tcl{{ version }}-src.tar.gz
+
+build:
+  number: 0
+  detect_binary_files_with_prefix: true
+  features:
+    - vc{{ VC_VERSION }}   # [win]
+
+requirements:
+  build:
+    - curl           # [win]
+    - 7za            # [win]
+    - vc {{ VC_VERSION }}  # [win]
+  run:
+    - vc {{ VC_VERSION }}  # [win]
+
+test:
+
+  files:
+    - hello.tcl
+
+  commands:
+    # Check for binaries.
+    - test -f "${PREFIX}/bin/tclsh"     # [unix]
+    - test -f "${PREFIX}/bin/tclsh8.5"  # [unix]
+    - if not exist %LIBRARY_PREFIX%\\bin\\tclsh.exe exit 1    # [win]
+    - if not exist %LIBRARY_PREFIX%\\bin\\tclsh85.exe exit 1  # [win]
+
+    # Check for includes.
+    - test -f "${PREFIX}/include/tcl.h"              # [unix]
+    - test -f "${PREFIX}/include/tclDecls.h"         # [unix]
+    - test -f "${PREFIX}/include/tclPlatDecls.h"     # [unix]
+    - test -f "${PREFIX}/include/tclTomMath.h"       # [unix]
+    - test -f "${PREFIX}/include/tclTomMathDecls.h"  # [unix]
+    - if not exist %LIBRARY_PREFIX%\\include\\tcl.h exit 1              # [win]
+    - if not exist %LIBRARY_PREFIX%\\include\\tclDecls.h exit 1         # [win]
+    - if not exist %LIBRARY_PREFIX%\\include\\tclPlatDecls.h exit 1     # [win]
+    - if not exist %LIBRARY_PREFIX%\\include\\tclTomMath.h exit 1       # [win]
+    - if not exist %LIBRARY_PREFIX%\\include\\tclTomMathDecls.h exit 1  # [win]
+
+    # Check for libraries.
+    # Library naming note: t means "full thread support" in Windows
+    #    https://sourceforge.net/p/tcl/mailman/tcl-bugs/thread/From_noreply@sourceforge.net_Mon_Jul_23_11:46:16_2012/
+    - test -f "${PREFIX}/lib/libtcl8.5.dylib"  # [osx]
+    - test -f "${PREFIX}/lib/libtcl8.5.so"     # [linux]
+    - test -f "${PREFIX}/lib/libtclstub8.5.a"  # [unix]
+    - if not exist %LIBRARY_PREFIX%\\lib\\tcl85.lib exit 1      # [win]
+    - if not exist %LIBRARY_PREFIX%\\bin\\tcl85.dll exit 1      # [win]
+    - if not exist %LIBRARY_PREFIX%\\lib\\tclstub85.lib exit 1  # [win]
+
+    # Check commands work and run a simple program.
+    - tclsh hello.tcl
+    - tclsh8.5 hello.tcl  # [unix]
+    - tclsh85 hello.tcl   # [win]
+
+about:
+  home: http://www.tcl.tk/
+  license: Tcl/Tk
+  license_family: BSD
+  summary: A dynamic programming language.
